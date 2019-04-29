@@ -55,3 +55,19 @@ class OxwallApp:
 
     def user_of_new_status_elements(self):
         return self.driver.find_elements_by_class_name('ow_newsfeed_string')
+
+    def is_element_present(self, how, what):
+        """ If present, return this element"""
+        # els = self.driver.find_elements(by=how, value=what)
+        # if len(els) == 0:
+        #     return False
+        # else:
+        #     return els
+        try:
+            el = self.driver.find_element(by=how, value=what)
+        except NoSuchElementException as e:
+            return False
+        return el
+
+    def user_menu_present(self):
+        return self.is_element_present(By.CSS_SELECTOR, '.ow_console_item.ow_console_dropdown:nth-child(5) > a')
