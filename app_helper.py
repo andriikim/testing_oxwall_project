@@ -13,17 +13,17 @@ class OxwallApp:
         # Open Oxwall site
         self.driver.get(base_url)
 
-    def login_as(self, username, password):
+    def login_as(self, user):
         driver = self.driver
         # Initialize login(click Sign in button)
         button = driver.find_elements_by_class_name("ow_console_item")
         button[0].click()
         # Input username
         username_field = driver.find_element_by_name("identity")
-        username_field.send_keys(username)
+        username_field.send_keys(user.username)
         # Input password
         passwd_field = driver.find_element_by_name('password')
-        passwd_field.send_keys(password)
+        passwd_field.send_keys(user.password)
         # Sign in
         button = driver.find_element_by_name('submit')
         button.click()
@@ -52,3 +52,6 @@ class OxwallApp:
 
     def status_text_elements(self):
         return self.driver.find_elements_by_class_name('ow_newsfeed_content')
+
+    def user_of_new_status_elements(self):
+        return self.driver.find_elements_by_class_name('ow_newsfeed_string')

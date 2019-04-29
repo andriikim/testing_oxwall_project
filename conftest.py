@@ -1,6 +1,7 @@
 import pytest
 from selenium import webdriver
 from app_helper import OxwallApp
+from models import User
 
 
 @pytest.fixture()
@@ -17,7 +18,8 @@ def app(driver):
 
 
 @pytest.fixture()
-def session(app):
-    app.login_as(username='admin', password='pass')
-    yield
+def logged_user(app):
+    user = User(username='admin', password='pass', real_name="Admin")
+    app.login_as(user)
+    yield user
     app.logout()
