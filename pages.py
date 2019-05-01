@@ -34,23 +34,38 @@ class BasePage:
         return el
 
 
-class MainPage(BasePage):
-    """ Actions that we made in Main Page"""
-    def login_as(self, user):
-        driver = self.driver
-        # Initialize login(click Sign in button)
-        button = driver.find_elements_by_class_name("ow_console_item")
-        button[0].click()
+class SignInPage(BasePage):
+    """ Actions on Sign In window (Page)"""
+    def input_username(self, user):
         # Input username
-        username_field = driver.find_element_by_name("identity")
+        username_field = self.driver.find_element_by_name("identity")
         username_field.send_keys(user.username)
+
+    def input_password(self, user):
         # Input password
-        passwd_field = driver.find_element_by_name('password')
+        passwd_field = self.driver.find_element_by_name('password')
         passwd_field.send_keys(user.password)
-        # Sign in
-        button = driver.find_element_by_name('submit')
+
+    def sign_in_click(self):
+        button = self.driver.find_element(By.NAME, 'submit')
         button.click()
-        return DashboardPage(driver)
+        return DashboardPage(self.driver)
+
+
+class InternalPages(BasePage):
+    """ Actions that common for all Internal Pages - menu actions"""
+    def sign_in_click(self):
+        # Initialize login(click Sign in button)
+        buttons = self.driver.find_elements_by_class_name("ow_console_item")
+        buttons[0].click()
+        return SignInPage(self.driver)
+
+    def login_as(self, user):
+        sign_in_page = self.sign_in_click()
+        sign_in_page.input_username(user)
+        sign_in_page.input_password(user)
+        dashboard_page = sign_in_page.sign_in_click()
+        return dashboard_page
 
     def logout(self):
         # Logout
@@ -58,9 +73,15 @@ class MainPage(BasePage):
         buttons = driver.find_elements_by_css_selector('.ow_console_item.ow_console_dropdown.ow_console_dropdown_hover')
         self.action.move_to_element(buttons[0]).perform()
         self.action.move_to_element(driver.find_element_by_link_text('Sign Out')).click().perform()
+        return MainPage(self.driver)
 
 
-class DashboardPage(BasePage):
+class MainPage(InternalPages):
+    """ Actions that we made in Main Page"""
+    # TODO: structure and action on Main Page
+
+
+class DashboardPage(InternalPages):
     """ Actions that we made in Dashboard Page"""
     def create_new_text_status(self, input_text):
         driver = self.driver
