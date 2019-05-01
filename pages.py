@@ -6,13 +6,36 @@ from selenium.common.exceptions import NoSuchElementException
 from custom_expected_condition import presence_of_num_elements
 
 
-class OxwallApp:
-    def __init__(self, driver, base_url="http://127.0.0.1/oxwall/"):
+# class OxwallApp:
+#     def __init__(self, driver, base_url="http://127.0.0.1/oxwall/"):
+#         self.driver = driver
+#         self.wait = WebDriverWait(driver, 10)
+#         # Open Oxwall site
+#         self.driver.get(base_url)
+
+class BasePage:
+    """ Common functional that we need for page actions """
+    def __init__(self, driver):
         self.driver = driver
         self.wait = WebDriverWait(driver, 10)
-        # Open Oxwall site
-        self.driver.get(base_url)
+        self.action = webdriver.ActionChains(driver)
 
+    def is_element_present(self, how, what):
+        """ If present, return this element"""
+        # els = self.driver.find_elements(by=how, value=what)
+        # if len(els) == 0:
+        #     return False
+        # else:
+        #     return els
+        try:
+            el = self.driver.find_element(by=how, value=what)
+        except NoSuchElementException as e:
+            return False
+        return el
+
+
+class MainPage(BasePage):
+    """ Actions that we made in Main Page"""
     def login_as(self, user):
         driver = self.driver
         # Initialize login(click Sign in button)
@@ -27,15 +50,18 @@ class OxwallApp:
         # Sign in
         button = driver.find_element_by_name('submit')
         button.click()
+        return DashboardPage(driver)
 
     def logout(self):
         # Logout
         driver = self.driver
         buttons = driver.find_elements_by_css_selector('.ow_console_item.ow_console_dropdown.ow_console_dropdown_hover')
-        action = webdriver.ActionChains(driver)
-        action.move_to_element(buttons[0]).perform()
-        action.move_to_element(driver.find_element_by_link_text('Sign Out')).click().perform()
+        self.action.move_to_element(buttons[0]).perform()
+        self.action.move_to_element(driver.find_element_by_link_text('Sign Out')).click().perform()
 
+
+class DashboardPage(BasePage):
+    """ Actions that we made in Dashboard Page"""
     def create_new_text_status(self, input_text):
         driver = self.driver
         # Enter new status text
@@ -55,19 +81,6 @@ class OxwallApp:
 
     def user_of_new_status_elements(self):
         return self.driver.find_elements_by_class_name('ow_newsfeed_string')
-
-    def is_element_present(self, how, what):
-        """ If present, return this element"""
-        # els = self.driver.find_elements(by=how, value=what)
-        # if len(els) == 0:
-        #     return False
-        # else:
-        #     return els
-        try:
-            el = self.driver.find_element(by=how, value=what)
-        except NoSuchElementException as e:
-            return False
-        return el
 
     def user_menu_present(self):
         return self.is_element_present(By.CSS_SELECTOR, '.ow_console_item.ow_console_dropdown:nth-child(5) > a')
