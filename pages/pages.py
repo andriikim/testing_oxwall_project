@@ -4,6 +4,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from custom_expected_condition import presence_of_num_elements
+from pages.blocks_elements import InputTextElement
 
 
 # class OxwallApp:
@@ -62,11 +63,11 @@ class SignInPage(BasePage):
 
     @property
     def username_field(self):
-        return self.find_element(self.USERNAME_INPUT)
+        return InputTextElement(self.find_element(self.USERNAME_INPUT))
 
     @property
     def passwd_field(self):
-        return self.find_element(self.PASSWORD_INPUT)
+        return InputTextElement(self.find_element(self.PASSWORD_INPUT))
 
     @property
     def signin_button(self):
@@ -74,13 +75,11 @@ class SignInPage(BasePage):
 
     def input_username(self, user):
         # Input username
-        self.username_field.clear()
-        self.username_field.send_keys(user.username)
+        self.username_field.input(user.username)
 
     def input_password(self, user):
         # Input password
-        self.passwd_field.clear()
-        self.passwd_field.send_keys(user.password)
+        self.passwd_field.input(user.password)
 
     def sign_in_click(self):
         self.signin_button.click()
@@ -134,7 +133,7 @@ class DashboardPage(InternalPages):
 
     @property
     def status_input_field(self):
-        return self.find_element(self.STATUS_INPUT_FIELD)
+        return InputTextElement(self.find_visible_element(self.STATUS_INPUT_FIELD))
 
     @property
     def send_button(self):
@@ -149,9 +148,8 @@ class DashboardPage(InternalPages):
         return self.find_all_visible_elements(self.STATUS_USER)
 
     def create_new_text_status(self, input_text):
-        driver = self.driver
         # Enter new status text
-        self.status_input_field.send_keys(input_text)
+        self.status_input_field.input(input_text)
         # Submit new status
         self.send_button.click()
 

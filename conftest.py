@@ -1,6 +1,6 @@
 import pytest
 from selenium import webdriver
-from pages import MainPage
+from pages.pages import MainPage
 from models import User
 
 
