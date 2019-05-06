@@ -33,6 +33,26 @@ class BasePage:
             return False
         return el
 
+    def find_element(self, locator):
+        return self.wait.until(EC.presence_of_element_located(locator),
+                               message=f"Can't find element by locator {locator}")
+
+    def find_elements(self, locator):
+        return self.wait.until(EC.presence_of_all_elements_located(locator),
+                               message=f"Can't find elements by locator {locator}")
+
+    def find_visible_element(self, locator):
+        return self.wait.until(EC.visibility_of_element_located(locator),
+                               message=f"Can't find visible element by locator {locator}")
+
+    def find_any_visible_elements(self, locator):
+        return self.wait.until(EC.visibility_of_any_elements_located(locator),
+                               message=f"Can't find any visible elements by locator {locator}")
+
+    def find_all_visible_elements(self, locator):
+        return self.wait.until(EC.visibility_of_all_elements_located(locator),
+                               message=f"Can't find all visible elements by locator {locator}")
+
 
 class SignInPage(BasePage):
     """ Locators and actions on Sign In window (Page)"""
@@ -42,15 +62,15 @@ class SignInPage(BasePage):
 
     @property
     def username_field(self):
-        return self.driver.find_element(*self.USERNAME_INPUT)
+        return self.find_element(self.USERNAME_INPUT)
 
     @property
     def passwd_field(self):
-        return self.driver.find_element(*self.PASSWORD_INPUT)
+        return self.find_element(self.PASSWORD_INPUT)
 
     @property
     def signin_button(self):
-        return self.driver.find_element(*self.SIGN_IN)
+        return self.find_element(self.SIGN_IN)
 
     def input_username(self, user):
         # Input username
@@ -74,7 +94,7 @@ class InternalPages(BasePage):
 
     @property
     def right_menu_items(self):
-        return self.driver.find_elements(*self.RIGHT_MENU_ELEMENTS)
+        return self.find_elements(self.RIGHT_MENU_ELEMENTS)
 
     def sign_in_click(self):
         # Initialize login(click Sign in button)
@@ -89,6 +109,7 @@ class InternalPages(BasePage):
         return dashboard_page
 
     def logout(self):
+        # TODO: extract elements
         # Logout
         driver = self.driver
         buttons = driver.find_elements_by_css_selector('.ow_console_item.ow_console_dropdown.ow_console_dropdown_hover')
@@ -107,15 +128,25 @@ class DashboardPage(InternalPages):
     STATUS_INPUT_FIELD = (By.NAME, 'status')
     SEND_BUTTON =(By.NAME, "save")
     STATUS_BLOCK = (By.XPATH, "//li[contains(@id, 'action-feed')]")
+    STATUS_TEXT = (By.CLASS_NAME, 'ow_newsfeed_content')
+    STATUS_USER = (By.CLASS_NAME, 'ow_newsfeed_string')
     # TODO: extract locators for other elements
 
     @property
     def status_input_field(self):
-        return self.wait.until(EC.presence_of_element_located(self.STATUS_INPUT_FIELD))
+        return self.find_element(self.STATUS_INPUT_FIELD)
 
     @property
     def send_button(self):
-        return self.driver.find_element(*self.SEND_BUTTON)
+        return self.find_visible_element(self.SEND_BUTTON)
+
+    @property
+    def status_text_elements(self):
+        return self.find_all_visible_elements(self.STATUS_TEXT)
+
+    @property
+    def user_of_new_status_elements(self):
+        return self.find_all_visible_elements(self.STATUS_USER)
 
     def create_new_text_status(self, input_text):
         driver = self.driver
@@ -130,13 +161,6 @@ class DashboardPage(InternalPages):
         status_text_elements = self.wait.until(presence_of_num_elements(self.STATUS_BLOCK, new_num))
         return status_text_elements[0]
 
-    @property
-    def status_text_elements(self):
-        return self.driver.find_elements_by_class_name('ow_newsfeed_content')
-
-    @property
-    def user_of_new_status_elements(self):
-        return self.driver.find_elements_by_class_name('ow_newsfeed_string')
-
     def user_menu_present(self):
+        # TODO: new style, extract element and locator
         return self.is_element_present(By.CSS_SELECTOR, '.ow_console_item.ow_console_dropdown:nth-child(5) > a')
