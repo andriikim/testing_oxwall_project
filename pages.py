@@ -40,19 +40,30 @@ class SignInPage(BasePage):
     USERNAME_INPUT = (By.NAME, 'identity')
     PASSWORD_INPUT = (By.NAME, 'password')
 
+    @property
+    def username_field(self):
+        return self.driver.find_element(*self.USERNAME_INPUT)
+
+    @property
+    def passwd_field(self):
+        return self.driver.find_element(*self.PASSWORD_INPUT)
+
+    @property
+    def signin_button(self):
+        return self.driver.find_element(*self.SIGN_IN)
+
     def input_username(self, user):
         # Input username
-        username_field = self.driver.find_element(*self.USERNAME_INPUT)
-        username_field.send_keys(user.username)
+        self.username_field.clear()
+        self.username_field.send_keys(user.username)
 
     def input_password(self, user):
         # Input password
-        passwd_field = self.driver.find_element(*self.PASSWORD_INPUT)
-        passwd_field.send_keys(user.password)
+        self.passwd_field.clear()
+        self.passwd_field.send_keys(user.password)
 
     def sign_in_click(self):
-        button = self.driver.find_element(*self.SIGN_IN)
-        button.click()
+        self.signin_button.click()
         return DashboardPage(self.driver)
 
 
@@ -61,10 +72,13 @@ class InternalPages(BasePage):
     RIGHT_MENU_ELEMENTS = (By.CLASS_NAME, "ow_console_item")
     #TODO: extract locators for other elements in logout method
 
+    @property
+    def right_menu_items(self):
+        return self.driver.find_elements(*self.RIGHT_MENU_ELEMENTS)
+
     def sign_in_click(self):
         # Initialize login(click Sign in button)
-        buttons = self.driver.find_elements(*self.RIGHT_MENU_ELEMENTS)
-        buttons[0].click()
+        self.right_menu_items[0].click()
         return SignInPage(self.driver)
 
     def login_as(self, user):
@@ -95,13 +109,20 @@ class DashboardPage(InternalPages):
     STATUS_BLOCK = (By.XPATH, "//li[contains(@id, 'action-feed')]")
     # TODO: extract locators for other elements
 
+    @property
+    def status_input_field(self):
+        return self.wait.until(EC.presence_of_element_located(self.STATUS_INPUT_FIELD))
+
+    @property
+    def send_button(self):
+        return self.driver.find_element(*self.SEND_BUTTON)
+
     def create_new_text_status(self, input_text):
         driver = self.driver
         # Enter new status text
-        status_input_field = self.wait.until(EC.presence_of_element_located(self.STATUS_INPUT_FIELD))
-        status_input_field.send_keys(input_text)
+        self.status_input_field.send_keys(input_text)
         # Submit new status
-        driver.find_element(*self.SEND_BUTTON).click()
+        self.send_button.click()
 
     def wait_new_status_appear(self, old_list_of_elements):
         # Wait until new status appears
@@ -109,9 +130,11 @@ class DashboardPage(InternalPages):
         status_text_elements = self.wait.until(presence_of_num_elements(self.STATUS_BLOCK, new_num))
         return status_text_elements[0]
 
+    @property
     def status_text_elements(self):
         return self.driver.find_elements_by_class_name('ow_newsfeed_content')
 
+    @property
     def user_of_new_status_elements(self):
         return self.driver.find_elements_by_class_name('ow_newsfeed_string')
 
