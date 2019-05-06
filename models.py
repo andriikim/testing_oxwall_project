@@ -10,6 +10,14 @@ class User:
         return f"{self.__class__}: username={self.username}, " \
                f"real_name={self.real_name}, email={self.email}"
 
+    def __repr__(self):
+        # TODO: explain
+        return f"{self.__class__}: username={self.username}, " \
+               f"real_name={self.real_name}"
+
+    def __eq__(self, other):
+        return (self.username, self.real_name) == (other.username, other.real_name)
+
 
 if __name__ == "__main__":
     user = User(username="admin")

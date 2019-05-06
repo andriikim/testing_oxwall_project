@@ -4,7 +4,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from custom_expected_condition import presence_of_num_elements
-from pages.blocks_elements import InputTextElement
+from pages.blocks_elements import InputTextElement, StatusBlock
 
 
 # class OxwallApp:
@@ -127,8 +127,6 @@ class DashboardPage(InternalPages):
     STATUS_INPUT_FIELD = (By.NAME, 'status')
     SEND_BUTTON =(By.NAME, "save")
     STATUS_BLOCK = (By.XPATH, "//li[contains(@id, 'action-feed')]")
-    STATUS_TEXT = (By.CLASS_NAME, 'ow_newsfeed_content')
-    STATUS_USER = (By.CLASS_NAME, 'ow_newsfeed_string')
     # TODO: extract locators for other elements
 
     @property
@@ -140,12 +138,16 @@ class DashboardPage(InternalPages):
         return self.find_visible_element(self.SEND_BUTTON)
 
     @property
-    def status_text_elements(self):
-        return self.find_all_visible_elements(self.STATUS_TEXT)
+    def statuses(self):
+        return [StatusBlock(item) for item in self.find_elements(self.STATUS_BLOCK)]
 
-    @property
-    def user_of_new_status_elements(self):
-        return self.find_all_visible_elements(self.STATUS_USER)
+    # @property
+    # def status_text_elements(self):
+    #     return self.find_all_visible_elements(self.STATUS_TEXT)
+    #
+    # @property
+    # def user_of_new_status_elements(self):
+    #     return self.find_all_visible_elements(self.STATUS_USER)
 
     def create_new_text_status(self, input_text):
         # Enter new status text
