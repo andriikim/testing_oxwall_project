@@ -1,8 +1,4 @@
-from models import User
-
-
-def test_login(app):                     # TODO: post-condition - logout
-    user = User(username='admin', password='pass', real_name="Admin")
+def test_login(app, user):                     # TODO: post-condition - logout
     app.main_page.sign_in_click()
     assert app.sign_in_page.is_this_page()
     assert app.sign_in_page.username_field.placeholder == "Username/Email"
