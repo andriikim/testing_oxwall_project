@@ -1,9 +1,11 @@
 import json
+import os
 import pytest
 from selenium import webdriver
 from pages.pages import OxwallApp
 from models import User
 
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 @pytest.fixture()
 def driver():
@@ -19,7 +21,7 @@ def app(driver):
     driver.get(base_url)
     return OxwallApp(driver)
 
-with open("data/user_data.json", encoding="utf8") as f:
+with open(os.path.join(PROJECT_DIR, "data", "user_data.json"), encoding="utf8") as f:
     user_data_list = json.load(f)
 
 @pytest.fixture(params=user_data_list, ids=[str(user) for user in user_data_list])

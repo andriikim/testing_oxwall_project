@@ -1,10 +1,12 @@
 import json
+import os
 import pytest
 
+from conftest import PROJECT_DIR
 from pages.pages import DashboardPage
 
-
-with open("data/status_data.json", encoding="utf8") as f:
+# TODO explain
+with open(os.path.join(PROJECT_DIR, "data", "status_data.json"), encoding="utf8") as f:
     status_text_list = json.load(f)
 
 @pytest.mark.parametrize("input_text", status_text_list)
