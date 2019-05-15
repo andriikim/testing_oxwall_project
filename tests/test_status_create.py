@@ -3,11 +3,15 @@ import os
 import pytest
 
 from conftest import PROJECT_DIR
+from data.random_string import random_string
 from pages.pages import DashboardPage
 
 # TODO explain
 with open(os.path.join(PROJECT_DIR, "data", "status_data.json"), encoding="utf8") as f:
     status_text_list = json.load(f)
+
+status_text_list.append(random_string())
+# status_text_list.extend([random_string() for _ in range(5)])
 
 @pytest.mark.parametrize("input_text", status_text_list)
 def test_create_status(driver, logged_user, input_text):
