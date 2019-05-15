@@ -1,6 +1,6 @@
 import pytest
 from selenium import webdriver
-from pages.pages import MainPage
+from pages.pages import OxwallApp
 from models import User
 
 
@@ -16,12 +16,11 @@ def driver():
 def app(driver):
     base_url = "http://127.0.0.1/oxwall/"
     driver.get(base_url)
-
+    return OxwallApp(driver)
 
 @pytest.fixture()
-def logged_user(driver):
+def logged_user(driver, app):
     user = User(username='admin', password='pass', real_name="Admin")
-    main_page = MainPage(driver)
-    main_page.login_as(user)
+    app.main_page.login_as(user)
     yield user
-    main_page.logout()
+    app.main_page.logout()

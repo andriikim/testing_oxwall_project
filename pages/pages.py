@@ -7,12 +7,16 @@ from custom_expected_condition import presence_of_num_elements
 from pages.blocks_elements import InputTextElement, StatusBlock
 
 
-# class OxwallApp:
-#     def __init__(self, driver, base_url="http://127.0.0.1/oxwall/"):
-#         self.driver = driver
-#         self.wait = WebDriverWait(driver, 10)
-#         # Open Oxwall site
-#         self.driver.get(base_url)
+class OxwallApp:
+    def __init__(self, driver, base_url="http://127.0.0.1/oxwall/"):
+        self.driver = driver
+        # Open Oxwall site
+        # self.driver.get(base_url)  # It's can be here in this approach
+
+        self.main_page = MainPage(self.driver)
+        self.dashboard_page = DashboardPage(self.driver)
+        self.sign_in_page = SignInPage(self.driver)
+
 
 class BasePage:
     """ Common functional that we need for page actions """
