@@ -21,7 +21,7 @@ class BasePage:
         self.wait = WebDriverWait(driver, 10)
         self.action = webdriver.ActionChains(driver)
 
-    def is_element_present(self, how, what):
+    def is_element_present(self, locator):
         """ If present, return this element"""
         # els = self.driver.find_elements(by=how, value=what)
         # if len(els) == 0:
@@ -29,7 +29,7 @@ class BasePage:
         # else:
         #     return els
         try:
-            el = self.driver.find_element(by=how, value=what)
+            el = self.driver.find_element(*locator)
         except NoSuchElementException as e:
             return False
         return el
@@ -60,6 +60,8 @@ class SignInPage(BasePage):
     SIGN_IN = (By.NAME, 'submit')
     USERNAME_INPUT = (By.NAME, 'identity')
     PASSWORD_INPUT = (By.NAME, 'password')
+    LOGIN_WINDOW_BOX = (By.CLASS_NAME, "floatbox_container")
+    LOGIN_BACKGROUND = (By.ID, "floatbox_overlay")
 
     @property
     def username_field(self):
@@ -73,6 +75,9 @@ class SignInPage(BasePage):
     def signin_button(self):
         return self.find_element(self.SIGN_IN)
 
+    def is_this_page(self):
+        return self.is_element_present(self.LOGIN_WINDOW_BOX)
+
     def input_username(self, user):
         # Input username
         self.username_field.input(user.username)
@@ -81,15 +86,25 @@ class SignInPage(BasePage):
         # Input password
         self.passwd_field.input(user.password)
 
-    def sign_in_click(self):
+    def submit_form(self):
         self.signin_button.click()
-        return DashboardPage(self.driver)
+        # TODO explain!
+        # need to wait disappearing background before making some action on Dashboard page
+        self.wait.until(EC.invisibility_of_element_located(self.LOGIN_BACKGROUND),
+                        "Login background is still visible")
+
+        return DashboardPage(self.driver)   # This can be deleted in this approach!
 
 
 class InternalPages(BasePage):
     """ Locators and actions that common for all Internal Pages - menu actions"""
     RIGHT_MENU_ELEMENTS = (By.CLASS_NAME, "ow_console_item")
+    ACTIVE_MENU = (By.XPATH, "//div[contains(@class, 'ow_menu_wrap')]//li[contains(@class, 'active')]")
     #TODO: extract locators for other elements in logout method
+
+    @property
+    def active_menu(self):
+        return self.find_element(self.ACTIVE_MENU)
 
     @property
     def right_menu_items(self):
@@ -104,8 +119,8 @@ class InternalPages(BasePage):
         sign_in_page = self.sign_in_click()
         sign_in_page.input_username(user)
         sign_in_page.input_password(user)
-        dashboard_page = sign_in_page.sign_in_click()
-        return dashboard_page
+        dashboard_page = sign_in_page.submit_form()
+        return dashboard_page  # This can be deleted in App (page aggregator) approach
 
     def logout(self):
         # TODO: extract elements
@@ -114,7 +129,7 @@ class InternalPages(BasePage):
         buttons = driver.find_elements_by_css_selector('.ow_console_item.ow_console_dropdown.ow_console_dropdown_hover')
         self.action.move_to_element(buttons[0]).perform()
         self.action.move_to_element(driver.find_element_by_link_text('Sign Out')).click().perform()
-        return MainPage(self.driver)
+        return MainPage(self.driver)  # This can be deleted in App (page aggregator) approach
 
 
 class MainPage(InternalPages):
@@ -163,4 +178,4 @@ class DashboardPage(InternalPages):
 
     def user_menu_present(self):
         # TODO: new style, extract element and locator
-        return self.is_element_present(By.CSS_SELECTOR, '.ow_console_item.ow_console_dropdown:nth-child(5) > a')
+        return self.is_element_present((By.CSS_SELECTOR, '.ow_console_item.ow_console_dropdown:nth-child(5) > a'))
