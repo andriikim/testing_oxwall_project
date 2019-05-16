@@ -1,12 +1,12 @@
 [
     {
-      "username": "admin",
+      "username": "test_test",
       "password": "pass",
-      "real_name": "Admin",
+      "real_name": "Тестировщие",
       "is_admin": true
     },
     {
-      "username": "tester",
+      "username": "tester#135",
       "password": "secret",
       "real_name": "How I am?",
       "is_admin": false
