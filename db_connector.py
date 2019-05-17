@@ -1,3 +1,4 @@
+import json
 import pymysql
 
 from models import User
@@ -51,3 +52,16 @@ class OxwallDB:
             result = cursor.fetchall()
         self.connection.commit()
         return [User(**u) for u in result]  # TODO explain!
+
+    def get_last_text_status(self):
+        """ Get status with maximum id that is last added """
+        with self.connection.cursor() as cursor:
+            sql = """SELECT * FROM `ow_newsfeed_action`
+                     WHERE `id`= (SELECT MAX(`id`) FROM `ow_newsfeed_action` WHERE `entityType`="user-status")
+                     AND `entityType`="user-status"
+                     """
+            cursor.execute(sql)
+            response = cursor.fetchone()
+            data = json.loads(response["data"])["status"]
+        self.connection.commit()
+        return data
