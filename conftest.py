@@ -9,9 +9,14 @@ from models import User
 
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+def pytest_addoption(parser):
+    parser.addoption("--config", action="store", default="config.json",
+                     help="config file")
+
 @pytest.fixture(scope="session")
-def config():
-    with open(os.path.join(PROJECT_DIR, "config.json")) as f:
+def config(request):
+    file_name = request.config.getoption("--config")
+    with open(os.path.join(PROJECT_DIR, file_name)) as f:
         return json.load(f)
 
 
