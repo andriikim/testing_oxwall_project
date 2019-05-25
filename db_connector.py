@@ -14,13 +14,12 @@ def _our_hash(password):
 
 
 class OxwallDB:
-    def __init__(self):
-        self.connection = pymysql.connect(host='localhost',
-                             user='root',
-                             password='mysql',
-                             db='oxwa166',
-                             charset='utf8mb4',
-                             cursorclass=pymysql.cursors.DictCursor)
+    def __init__(self, configs):
+        self.connection = pymysql.connect(
+            **configs,
+            charset='utf8mb4',
+            cursorclass=pymysql.cursors.DictCursor
+        )
         self.connection.autocommit = True  # чтоб автокомитилось
 
     def close(self):

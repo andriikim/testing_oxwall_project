@@ -9,6 +9,12 @@ from models import User
 
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+@pytest.fixture(scope="session")
+def config():
+    with open(os.path.join(PROJECT_DIR, "config.json")) as f:
+        return json.load(f)
+
+
 @pytest.fixture()
 def driver(selenium):
     driver = selenium
@@ -23,8 +29,8 @@ def app(driver, base_url):
     return OxwallApp(driver)
 
 @pytest.fixture(scope="session")
-def db():
-    db = OxwallDB()
+def db(config):
+    db = OxwallDB(config["db"])
     yield db
     db.close()
 
@@ -39,8 +45,8 @@ def user(request, db):
     db.delete_user(user)
 
 @pytest.fixture()
-def logged_user(driver, app):
-    user = User(username='admin', password='pass', real_name="Admin")
+def logged_user(app, config):
+    user = User(**config["web"]["admin"], is_admin=True)
     app.main_page.login_as(user)
     yield user
     app.main_page.logout()
