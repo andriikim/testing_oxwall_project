@@ -18,8 +18,7 @@ def driver(selenium):
 
 
 @pytest.fixture(autouse=True)
-def app(driver):
-    base_url = "http://127.0.0.1/oxwall/"
+def app(driver, base_url):
     driver.get(base_url)
     return OxwallApp(driver)
 
