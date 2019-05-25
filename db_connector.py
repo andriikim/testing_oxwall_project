@@ -21,6 +21,7 @@ class OxwallDB:
                              db='oxwa166',
                              charset='utf8mb4',
                              cursorclass=pymysql.cursors.DictCursor)
+        self.connection.autocommit = True  # чтоб автокомитилось
 
     def close(self):
         self.connection.close()
@@ -31,16 +32,20 @@ class OxwallDB:
             sql = f"""INSERT `ow_base_user` (`username`, `email`, `password`, `joinIp`)
                       VALUES ("{user.username}", "{user.email}", "{_our_hash(user.password)}", "21423532")"""
             cursor.execute(sql)
-        # connection is not autocommit by default. So you must commit to save
-        # your changes.
-        self.connection.commit()
+        # add related data (real_name) to ow_base_question_data table
+        with self.connection.cursor() as cursor:
+            sql1 = f"SELECT * FROM ow_base_user WHERE ow_base_user.username = '{user.username}'"
+            cursor.execute(sql1)
+            userid = cursor.fetchone()['id']
+            sql = f"""INSERT `ow_base_question_data` (`userId`, `textValue`, `questionName`)
+                      VALUES ("{userid}", "{user.real_name}", "realname")"""
+            cursor.execute(sql)
 
     def delete_user(self, user):
         with self.connection.cursor() as cursor:
             sql = f'''DELETE FROM `ow_base_user`
                       WHERE `ow_base_user`.`username` = "{user.username}"'''
             cursor.execute(sql)
-        self.connection.commit()
 
     def get_users(self):
         """
@@ -50,7 +55,6 @@ class OxwallDB:
             sql = "SELECT * FROM `ow_base_user`"
             cursor.execute(sql)
             result = cursor.fetchall()
-        self.connection.commit()
         return [User(**u) for u in result]  # TODO explain!
 
     def get_last_text_status(self):
@@ -63,5 +67,12 @@ class OxwallDB:
             cursor.execute(sql)
             response = cursor.fetchone()
             data = json.loads(response["data"])["status"]
-        self.connection.commit()
         return data
+
+    def count_status(self):
+        with self.connection.cursor() as cursor:
+            sql = """SELECT COUNT(*) FROM `ow_newsfeed_action`
+                     WHERE `entityType`="user-status"
+                  """
+            cursor.execute(sql)
+        return cursor.fetchone()['COUNT(*)']
