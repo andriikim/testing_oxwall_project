@@ -10,8 +10,8 @@ from models import User
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 @pytest.fixture()
-def driver():
-    driver = webdriver.Chrome()
+def driver(selenium):
+    driver = selenium
     driver.implicitly_wait(5)
     yield driver
     driver.quit()
